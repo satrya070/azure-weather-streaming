@@ -1,0 +1,25 @@
+[project]
+name = "azure-weather"
+version = "1.0.0"
+description = "A realtime data pipeline for processing weather data"
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [{"name" = "Satrya"}]
+
+[tool.poetry]
+packages = [
+    { include = "azure_weather", from = "src" }
+]
+
+[tool.poetry.dependencies]
+python-dotenv = "^1.1.0"
+azure-eventhub = "^5.15.0"
+
+[tool.poetry.group.dev.dependencies]
+jupyterlab = "^4.4.2"
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.meta"
+
+[project.scripts]
