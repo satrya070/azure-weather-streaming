@@ -5,4 +5,4 @@ build:
 	docker build -t ${DOCKER_NAME} -f weather_producer/Dockerfile ${BUILD_CONTEXT}
 
 run:
-	docker run --env-file .env weather_producer
+	docker run --env-file .env ${DOCKER_NAME}
