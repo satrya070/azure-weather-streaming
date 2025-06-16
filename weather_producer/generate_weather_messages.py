@@ -65,11 +65,12 @@ def retry_with_delay(
 
 
 if __name__ == "__main__":
+    AMOUNT_MESSAGES = 28_800  # this should be around 2 days with a mesage per 6 seconds
     retry_streak = 0
 
     try:
         # send a message every 6 seconds
-        for i in range(10):
+        for i in range(AMOUNT_MESSAGES):
             try:
                 retry_with_delay(send_data)
 

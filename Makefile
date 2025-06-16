@@ -6,3 +6,7 @@ build:
 
 run:
 	docker run --env-file .env ${DOCKER_NAME}
+
+build-push-az:
+	docker build -t weatherarcz-dcd4cyfghhf0abbt.azurecr.io/weather_producer:latest -f weather_producer/Dockerfile ${BUILD_CONTEXT}
+	docker push weatherarcz-dcd4cyfghhf0abbt.azurecr.io/weather_producer:latest
