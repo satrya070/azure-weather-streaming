@@ -1469,6 +1469,18 @@ files = [
 tests = ["pytest"]
 
 [[package]]
+name = "py4j"
+version = "0.10.9.9"
+description = "Enables Python programs to dynamically access arbitrary Java objects"
+optional = false
+python-versions = "*"
+groups = ["main"]
+files = [
+    {file = "py4j-0.10.9.9-py2.py3-none-any.whl", hash = "sha256:c7c26e4158defb37b0bb124933163641a2ff6e3a3913f7811b0ddbe07ed61533"},
+    {file = "py4j-0.10.9.9.tar.gz", hash = "sha256:f694cad19efa5bd1dee4f3e5270eb406613c974394035e5bfc4ec1aba870b879"},
+]
+
+[[package]]
 name = "pycparser"
 version = "2.22"
 description = "C parser in Python"
@@ -1494,6 +1506,27 @@ files = [
 
 [package.extras]
 windows-terminal = ["colorama (>=0.4.6)"]
+
+[[package]]
+name = "pyspark"
+version = "4.0.0"
+description = "Apache Spark Python API"
+optional = false
+python-versions = ">=3.9"
+groups = ["main"]
+files = [
+    {file = "pyspark-4.0.0.tar.gz", hash = "sha256:38db1b4f6095a080d7605e578d775528990e66dc326311d93e94a71cfc24e5a5"},
+]
+
+[package.dependencies]
+py4j = "0.10.9.9"
+
+[package.extras]
+connect = ["googleapis-common-protos (>=1.65.0)", "grpcio (>=1.67.0)", "grpcio-status (>=1.67.0)", "numpy (>=1.21)", "pandas (>=2.0.0)", "pyarrow (>=11.0.0)"]
+ml = ["numpy (>=1.21)"]
+mllib = ["numpy (>=1.21)"]
+pandas-on-spark = ["numpy (>=1.21)", "pandas (>=2.0.0)", "pyarrow (>=11.0.0)"]
+sql = ["numpy (>=1.21)", "pandas (>=2.0.0)", "pyarrow (>=11.0.0)"]
 
 [[package]]
 name = "python-dateutil"
@@ -2276,4 +2309,4 @@ test = ["websockets"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.10"
-content-hash = "74f38347e3c1682b48288133749a2df2e65f750026f38d724b31e6096db5550b"
+content-hash = "4afd7a155d2cdd417dcf52e717865251db8b6c4eed0b5f0fe62f3debc20f3c6a"
