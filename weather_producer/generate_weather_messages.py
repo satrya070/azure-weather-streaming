@@ -2,6 +2,7 @@ import requests
 import json
 import os
 import time
+import logging
 
 from dotenv import load_dotenv
 from azure.eventhub import EventHubProducerClient, EventData
@@ -18,6 +19,8 @@ APIKEY = os.getenv("APIKEY")
 CONN_STR = os.getenv("CONN_STR")
 EVENTHUB = os.getenv("EVENTHUB")
 
+producer = EventHubProducerClient.from_connection_string(conn_str=CONN_STR, eventhub_name=EVENTHUB)
+
 def create_data_message():
     response = requests.get(f"https://api.openweathermap.org/data/2.5/weather?lat={LAT}&lon={LON}&appid={APIKEY}")
     data = json.loads(response.content)
@@ -26,7 +29,7 @@ def create_data_message():
 
 def send_data(data: dict):
     # create producer
-    producer = EventHubProducerClient.from_connection_string(conn_str=CONN_STR, eventhub_name=EVENTHUB)
+    data = create_data_message()
 
     try:
         batch = producer.create_batch()
@@ -37,15 +40,43 @@ def send_data(data: dict):
     except Exception as e:
         print(f"failed: {e}")
         raise e
-    finally:
-        print("closing producer")
-        producer.close()
+
+def retry_with_delay(
+    fn,
+    max_retries=5,
+    delay=30.0
+):
+    for attempt in range(max_retries):
+        try:
+            return(fn)
+        except Exception as e:
+            logging.error(f"attempt {attempt}: function failed on error: {e}")
+            time.sleep(delay)
+    
+    raise RuntimeError(f"functions failed after {max_retries} retries.")
 
 
 if __name__ == "__main__":
-    print(CONN_STR)
-    # send a message every 5 seconds
-    for i in range(1):
-        data = create_data_message()
-        send_data(data)
-        time.sleep(3)
+    retry_streak = 0
+
+    try:
+        # send a message every 5 seconds
+        for i in range(1):
+            try:
+                retry_with_delay(send_data)
+
+                # reset retry streak if succeeded again after failed execution
+                if retry_streak > 0:
+                    retry_streak = 0
+            except Exception as final_error:
+                logging.error(f"failed after 5 retries on {final_error}")
+                retry_blocks += 1
+
+                if retry_blocks == 10:
+                    raise Exception("max retry block reached, stopping execution.")
+
+            time.sleep(5)
+
+    finally:
+        print("done, closing producer")
+        producer.close()
