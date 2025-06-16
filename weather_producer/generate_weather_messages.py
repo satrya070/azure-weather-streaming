@@ -10,6 +10,13 @@ from azure.eventhub import EventHubProducerClient, EventData
 
 load_dotenv()
 
+# logging configuration
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s: %(message)s",
+    datefmt="%Y-%m-%d-%H:%m:%S"
+)
+
 # set to track The Hague
 LAT = 52.076066
 LON =  4.317899
@@ -27,7 +34,7 @@ def create_data_message():
 
     return data
 
-def send_data(data: dict):
+def send_data():
     # create producer
     data = create_data_message()
 
@@ -35,10 +42,11 @@ def send_data(data: dict):
         batch = producer.create_batch()
         data = create_data_message()
         batch.add(EventData(json.dumps(data)))
-        producer.send_batch(batch)
-        print("message send succesfully")
+        #producer.send_batch(batch)
+        producer.send_event(EventData(json.dumps(data)))
+        logging.info("message send succesfully")
     except Exception as e:
-        print(f"failed: {e}")
+        logging.error(f"failed: {e}")
         raise e
 
 def retry_with_delay(
@@ -48,7 +56,7 @@ def retry_with_delay(
 ):
     for attempt in range(max_retries):
         try:
-            return(fn)
+            return fn()
         except Exception as e:
             logging.error(f"attempt {attempt}: function failed on error: {e}")
             time.sleep(delay)
@@ -60,8 +68,8 @@ if __name__ == "__main__":
     retry_streak = 0
 
     try:
-        # send a message every 5 seconds
-        for i in range(1):
+        # send a message every 6 seconds
+        for i in range(10):
             try:
                 retry_with_delay(send_data)
 
@@ -74,9 +82,8 @@ if __name__ == "__main__":
 
                 if retry_blocks == 10:
                     raise Exception("max retry block reached, stopping execution.")
-
-            time.sleep(5)
-
+                
+            time.sleep(6)
     finally:
-        print("done, closing producer")
+        logging.info("done, closing producer")
         producer.close()
